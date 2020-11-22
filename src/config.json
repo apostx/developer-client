@@ -1,0 +1,5 @@
+{
+    "servers": ["ws://echo.websocket.org"],
+    "connectors": ["websocket"],
+    "messages": [{"label": "Hello World!", "message": "Hello World!"}]
+}
