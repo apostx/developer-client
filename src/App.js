@@ -1,17 +1,24 @@
-import config from './config.json';
 import _ from 'lodash';
 import 'semantic-ui-css/semantic.min.css';
-import { useEffect, useRef } from 'react';
-import { createStore, applyMiddleware } from 'redux';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { Container, Input, List, Segment, Grid, Header, Menu, Ref, Sticky, Rail, Placeholder, Button, Dropdown, Select, Message, Sidebar, Icon } from 'semantic-ui-react';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Container, Input, Segment, Grid, Menu, Placeholder, Button, Select, Message, Sidebar, Icon } from 'semantic-ui-react';
+
+import {GetDynamicMessage} from './store/selector/MessageSelector';
+import {GetLogs} from './store/selector/LogSelector';
+import {GetServer} from './store/selector/MenuSelector';
+import {
+    GetServers,
+    GetConnectors,
+    GetMessages,
+} from './store/selector/ConfigSelector';
 
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text);
 }
 
 function DynamicMessageElement({onSend}) {
-    const message = useSelector((state) => state.dynamicMessage);
+    const message = useSelector(GetDynamicMessage);
     const dispatch = useDispatch();
     const onChange = (event) => dispatch({type: 'DYNAMIC_MESSAGE_CHANGED', payload: {dynamicMessage: event.target.value}});
     
@@ -45,6 +52,8 @@ function LogElement({type, children}) {
         case 'incoming':
             conf = {color: 'yellow', icon: 'arrow down'};
             break;
+
+        default:
     }
     
     return (
@@ -53,16 +62,18 @@ function LogElement({type, children}) {
 }
 
 function TopMenu() {
-    const server = useSelector((state) => state.server);
+    const serverList = useSelector(GetServers);
+    const connectorList = useSelector(GetConnectors);
+    const server = useSelector(GetServer);
     const dispatch = useDispatch();
     
     const onServerChange = (event) => dispatch({type: 'SERVER_CHANGED', payload: {server: event.target.value}});
     const onConnectClick = () => dispatch({type: 'CONNECT', payload: {server}});
     const onDisconnectClick = () => dispatch({type: 'DISCONNECT', payload: {server}});
    
-    const servers = config.servers.map(server => (<option value={server}>{server}</option>));
-    const connectors = config.connectors.map(connector => ({key: connector, value: connector, text: connector}));
-    const defaultConnector = config.connectors.length > 0 ? config.connectors[0] : '';
+    const servers = serverList.map(server => (<option value={server}>{server}</option>));
+    const connectors = connectorList.map(connector => ({key: connector, value: connector, text: connector}));
+    const defaultConnector = connectorList.length > 0 ? connectorList[0] : '';
     
     return (
         <Sidebar as={Menu} direction='top' visible>
@@ -80,7 +91,7 @@ function TopMenu() {
 }
 
 function RightMenu() {
-    const logs = useSelector((state) => state.logs);
+    const logs = useSelector(GetLogs);
     const logElements = logs.map(({type, message}) => (<LogElement type={type}>{message}</LogElement>));
     
     return (
@@ -93,9 +104,12 @@ function RightMenu() {
 
 function Content() {
     const dispatch = useDispatch();
+
+    const messageList = useSelector(GetMessages);
+
     const onSend = (message) => dispatch({type: 'SEND_MESSAGE', payload: {message}});
     
-    const messages = config.messages.map(({message, label}) => (<StaticMessageElement label={label} message={message} onSend={onSend}/>));
+    const messages = messageList.map(({message, label}) => (<StaticMessageElement label={label} message={message} onSend={onSend}/>));
     
     return (
         <Container style={{ margin: 20 }}>
@@ -107,6 +121,14 @@ function Content() {
 }
 
 function App() {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        fetch('config.json')
+            .then(response => response.json())
+            .then(config => dispatch({type: 'CONFIG_CHANGED', payload: config}));
+    }, [dispatch]);
+
     return (
         <>
             <Content />
@@ -116,74 +138,4 @@ function App() {
     );
 };
 
-let websocket = null;
-
-const websocketMiddleWare = ({dispatch}) => (next) => (action) => {
-    switch (action.type) {
-        case 'CONNECT':
-            if (!websocket) {
-                websocket = new WebSocket(action.payload.server);
-                
-                websocket.onopen = () => dispatch({type: 'LOG', payload: {type: 'system', message: 'CONNECTED'}});
-                websocket.onclose = () => dispatch({type: 'LOG', payload: {type: 'system', message: 'DISCONNECTED'}});
-                websocket.onmessage = (event) => dispatch({type: 'LOG', payload: {type: 'incoming', message: event.data}});
-                websocket.onerror = (event) => dispatch({type: 'LOG', payload: {type: 'system', message: event.data}});
-            }
-            break;
-        case 'DISCONNECT':
-            if (websocket) {
-                websocket.close();
-                websocket = null;
-                //dispatch({type: 'LOG', payload: {type: 'system', message: 'DISCONNECTED'}});
-            }
-        case 'SEND_MESSAGE':
-            if (websocket) {
-                const message = action.payload.message;
-                websocket.send(message);
-                dispatch({type: 'LOG', payload: {type: 'outgoing', message}});
-            }
-    }
-
-    next(action);
-};
-
-const messageReducer = (state = {logs: [], dynamicMessage: '', server: ''}, action) => {
-    switch (action.type) {
-        case 'DYNAMIC_MESSAGE_CHANGED':
-            return {
-                ...state,
-                ...action.payload,
-            };
-        case 'SERVER_CHANGED':
-            return {
-                ...state,
-                ...action.payload,
-            };
-        case 'LOG':
-            const logs = [...state.logs];
-            logs.push(action.payload);
-
-            return {
-                ...state,
-                logs,
-            };
-
-        default:
-            return state;
-    }
-};
-
-const store = createStore(
-    messageReducer,
-    applyMiddleware(websocketMiddleWare),
-);
-
-function App2() {
-    return (
-        <Provider store={store}>
-            <App />
-        </Provider>
-    );
-};
-
-export default App2;
+export default App;
