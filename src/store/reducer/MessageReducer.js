@@ -8,7 +8,7 @@ const messageReducer = (state = initialState, {type, payload}) => {
             localStorage.setItem('customMessage', payload.dynamicMessage);
 
             return {
-                ...state,
+                ...state,
                 ...payload,
             };
 
