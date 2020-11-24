@@ -9,6 +9,7 @@ import { sendMessage } from "../../store/action/ConnectionAction";
 
 import DynamicMessageElement from './DynamicMessageElement';
 import StaticMessageElement from './StaticMessageElement';
+import SeparatorElement from './SeparatorElement';
 
 export default function Content() {
     const dispatch = useDispatch();
@@ -17,7 +18,10 @@ export default function Content() {
 
     const onSend = (message) => dispatch(sendMessage(message));
     
-    const messages = messageList.map(({message, label}) => (<StaticMessageElement label={label} message={message} onSend={onSend}/>));
+    const messages = messageList.map(({message, label}) => message ?
+        (<StaticMessageElement label={label} message={message} onSend={onSend}/>) :
+        (<SeparatorElement>{label}</SeparatorElement>)
+    );
     
     return (
         <Container style={{ margin: 20 }}>

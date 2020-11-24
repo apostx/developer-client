@@ -9,11 +9,11 @@ import LogItem from './LogItem';
 
 export default function RightSidebar() {
     const logs = useSelector(GetLogs);
-    const logElements = logs.map(({type, message}) => (<LogItem type={type}>{message}</LogItem>));
+    const logElements = logs.map(({type, message}, index) => (<Menu.Item key={index + 3}><LogItem type={type}>{message}</LogItem></Menu.Item>));
     
     return (
         <Sidebar as={Menu} direction='right' vertical visible width='wide'>
-            {_.times(3, (i) => (<Menu.Item><Placeholder key={i} /></Menu.Item>))}
+            {_.times(3, (index) => (<Menu.Item key={index}><Placeholder /></Menu.Item>))}
             {logElements}
         </Sidebar>
     );

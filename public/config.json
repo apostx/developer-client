@@ -1,5 +1,5 @@
 {
     "servers": ["ws://echo.websocket.org"],
     "connectors": ["websocket"],
-    "messages": [{"label": "Hello World!", "message": "Hello World!"}]
+    "messages": [{"label": "Configured Messages"}, {"label": "Hello World!", "message": "Hello World!"}]
 }

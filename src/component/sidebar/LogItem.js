@@ -14,6 +14,9 @@ export default function LogItem({type, children}) {
     }
     
     return (
-        <Menu.Item><Message style={{ overflow: 'auto', userSelect: true, maxHeight: '50vh' }} color={conf.color} floating><Icon name={conf.icon}/>{children}</Message></Menu.Item>
+        <Message style={{ overflow: 'auto', userSelect: true, maxHeight: '50vh' }} color={conf.color} floating>
+            <Icon name={conf.icon}/>
+            {children}
+        </Message>
     );
 }
