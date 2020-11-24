@@ -1,11 +1,13 @@
+import {SET_DYNAMIC_MESSAGE} from '../action/MessageAction';
+
 const initialState = {
-    dynamicMessage: localStorage.getItem('customMessage') || '',
+    dynamicMessage: localStorage.getItem('dynamicMessage') || '',
 }
 
 const messageReducer = (state = initialState, {type, payload}) => {
     switch (type) {
-        case 'DYNAMIC_MESSAGE_CHANGED':
-            localStorage.setItem('customMessage', payload.dynamicMessage);
+        case 'SET_DYNAMIC_MESSAGE':
+            localStorage.setItem('dynamicMessage', payload.dynamicMessage);
 
             return {
                 ...state,

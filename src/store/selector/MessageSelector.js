@@ -1,5 +1,1 @@
-const GetDynamicMessage = (state) => state.messageReducer.dynamicMessage;
-
-export {
-    GetDynamicMessage,
-};
+export const GetDynamicMessage = (state) => state.messageReducer.dynamicMessage;

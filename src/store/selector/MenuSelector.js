@@ -1,5 +1,1 @@
-const GetServer = (state) => state.menuReducer.server;
-
-export {
-    GetServer,
-};
+export const GetServerUrl = (state) => state.menuReducer.serverUrl;

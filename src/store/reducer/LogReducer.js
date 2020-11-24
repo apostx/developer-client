@@ -1,10 +1,12 @@
+import {ADD_LOG} from '../middleware/WebsocketMiddleware';
+
 const initialState = {
     logs: [],
 }
 
 const logReducer = (state = initialState, {type, payload}) => {
     switch (type) {
-        case 'LOG':
+        case ADD_LOG:
             const logs = [...state.logs];
             logs.push(payload);
     

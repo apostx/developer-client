@@ -1,3 +1,5 @@
+import {SET_CONFIG} from '../action/ConfigAction';
+
 const initialState = {
     servers: [],
     connectors: [],
@@ -6,7 +8,7 @@ const initialState = {
 
 const configReducer = (state = initialState, {type, payload}) => {
     switch (type) {
-        case 'CONFIG_CHANGED':
+        case SET_CONFIG:
             return {
                 ...state,
                 ...payload,

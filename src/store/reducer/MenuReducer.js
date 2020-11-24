@@ -1,11 +1,13 @@
+import {SET_SERVER_URL} from '../action/SettingsAction';
+
 const initialState = {
-    server: localStorage.getItem('serverUrl') || '',
+    serverUrl: localStorage.getItem('serverUrl') || '',
 }
 
 const menuReducer = (state = initialState, {type, payload}) => {
     switch (type) {
-        case 'SERVER_CHANGED':
-            localStorage.setItem('serverUrl', payload.server);
+        case SET_SERVER_URL:
+            localStorage.setItem('serverUrl', payload.serverUrl);
 
             return {
                 ...state,
