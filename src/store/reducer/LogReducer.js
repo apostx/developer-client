@@ -1,4 +1,4 @@
-import {ADD_LOG} from '../middleware/WebsocketMiddleware';
+import {ADD_LOG} from '../action/LogAction';
 
 const initialState = {
     logs: [],

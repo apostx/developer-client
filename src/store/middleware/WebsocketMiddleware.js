@@ -1,6 +1,6 @@
-let websocket = null;
+import {ADD_LOG} from '../action/LogAction';
 
-export const ADD_LOG = 'ADD_LOG';
+let websocket = null;
 
 const websocketMiddleware = ({dispatch}) => (next) => (action) => {
     switch (action.type) {
